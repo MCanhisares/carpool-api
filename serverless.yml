@@ -1,0 +1,113 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: serverless
+# app and org for use with dashboard.serverless.com
+app: carpool-serverless
+org: mcanhisares
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  environment:
+    DYNAMODB_TABLE: carpool
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+plugins:
+  - serverless-offline
+  - serverless-dynamodb-local
+
+functions:
+  create:
+    handler: handler.create
+    events:
+      - http:
+          path: ride
+          method: post
+          cors: true
+
+  get:
+    handler: handler.get
+    events:
+      - http:
+          path: ride/{id}
+          method: get
+          cors: true
+
+  scanPassenger:
+    handler: handler.scanPassenger
+    events:
+      - http:
+          path: ride/{id}/scan-passenger
+          method: post
+          cors: true
+
+  confirmPassenger:
+    handler: handler.confirmPassenger
+    events:
+      - http:
+          path: ride/{id}/confirm-passenger
+          method: get
+          cors: true
+
+  confirmDriver:
+    handler: handler.confirmDriver
+    events:
+      - http:
+          path: ride/{id}/confirm-driver
+          method: get
+          cors: true                    
+
+  # update:
+  #   handler: todos/update.update
+  #   events:
+  #     - http:
+  #         path: todos/{id}
+  #         method: put
+  #         cors: true
+   
+custom:
+  dynamodb:
+    stages:
+      - ${self:provider.stage}
+
+resources:
+  Resources:
+    RidesDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: rideId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: rideId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+
+
+

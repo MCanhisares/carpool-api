@@ -1,0 +1,16 @@
+{
+  "name": "carpool-sls",
+  "version": "1.0.0",
+  "description": "Carpool backend",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.553.0",
+    "qrcode": "^1.4.2",
+    "uuid": "^2.0.3"
+  },
+  "devDependencies": {
+    "serverless-offline": "^5.12.0",
+    "serverless-dynamodb-local": "^0.2.18"
+  }
+}
